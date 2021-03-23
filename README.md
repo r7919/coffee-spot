@@ -1,4 +1,4 @@
-## coffee-spot
+## Coffee Spot
 
 - This project solves the problem of waiting time in a Coffee
 Shop.
