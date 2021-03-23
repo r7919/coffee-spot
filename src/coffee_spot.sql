@@ -30,3 +30,20 @@ CREATE TABLE admins (
 );
 
 INSERT INTO admins VALUES (1,'ubc','admin','ubc@admin.com','ubc','$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
+
+-- users
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id int NOT NULL AUTO_INCREMENT,
+  username varchar(255) DEFAULT NULL,
+  hashed_password varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY index_username (username)
+);
+
+INSERT INTO users VALUES (1, 'user', '$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
+
+
+
+
