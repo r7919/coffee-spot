@@ -29,6 +29,7 @@
     // Having a user_id in the session serves a dual-purpose:
     // - Its presence indicates the user is logged in.
     // - Its value tells which user for looking up their record.
+    // print_r($_SESSION);
     return isset($_SESSION['user_id']);
   }
 

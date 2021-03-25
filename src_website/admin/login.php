@@ -1,6 +1,9 @@
 <?php
 require_once('shared/initialize.php');
 
+if (is_logged_in())
+  redirect_to(url_for('/index.php'));
+
 $errors = [];
 $username = '';
 $password = '';

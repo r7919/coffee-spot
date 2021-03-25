@@ -1,5 +1,194 @@
 <?php
 
+  // Spots
+
+  function find_all_reservations() {
+    global $db;
+
+    $sql = "SELECT * FROM reservation ";
+    $sql .= "ORDER BY start_time ASC";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  function get_spot_status($id) {
+    global $db;
+
+    $sql = "SELECT * FROM spot ";
+    $sql .= "WHERE spot_id='" . $id . "' ";
+
+    $result = mysqli_query($db, $sql);
+    
+    // For UPDATE statements, $result is true/false
+    if($result) {
+      while ($spot = mysqli_fetch_assoc($result)) {
+        mysqli_free_result($result);
+        return (int) $spot['spot_status'];
+      }
+    } else {
+      // UPDATE failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }   
+  }
+
+  // user reservations
+  function find_all_user_reservations() {
+    global $db;
+
+    $sql = "SELECT * FROM reservation ";
+    $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." ";
+    $sql .= "ORDER BY start_time DESC";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  // dealloc
+  function sync_spots() {
+    $reservations = find_all_reservations();
+
+    while ($reservation = mysqli_fetch_assoc($reservations)) {
+      if (((int) strtotime($reservation['start_time'])) <= ((int) (time()))) {
+        update_spot($reservation['spot_id'], 1);
+      }
+      if (((int) strtotime($reservation['end_time'])) <= ((int) (time()))) {
+        update_spot($reservation['spot_id'], 0);
+      }
+    }
+
+    mysqli_free_result($reservations);
+  }
+
+  // alloc
+  function update_spot($id, $status) {
+    global $db;
+
+    $sql = "UPDATE spot SET ";
+    $sql .= "spot_status='" . $status . "' ";
+    $sql .= "WHERE spot_id='" . $id . "' ";
+    $sql .= "LIMIT 1";
+
+    $result = mysqli_query($db, $sql);
+    
+    // For UPDATE statements, $result is true/false
+    if($result) {
+      return true;
+    } else {
+      // UPDATE failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }    
+  }
+
+  function find_all_spots($options=[]) {
+    global $db;
+
+    $sql = "SELECT * FROM spot ";
+    $sql .= "ORDER BY spot_id ASC";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    return $result;
+  }
+
+  function empty_spots_count() {
+    global $db;
+
+    $sql = "SELECT COUNT(*) AS C FROM spot ";
+    $sql .= "WHERE spot_status=0";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return (int) mysqli_fetch_assoc($result)['C'];
+  }
+
+  function validate_reservation($spot_ids, $start_time, $end_time) {
+    $errors = [];
+
+    // start time
+    if (is_blank($start_time)) {
+      $errors[] = "Start time cannot be blank.";
+    }
+
+    // end time
+    if (is_blank($end_time)) {
+      $errors[] = "End time cannot be blank.";
+    }
+
+    // spots full
+    if (empty_spots_count() == 0) {
+      $errors[] = "Sorry, all spots are booked.";
+    }
+    else if (count($spot_ids) == 0) {
+      $errors[] = "Select atleast one spot.";
+    }
+
+    // validate time
+    $start_time = date("Y-m-d") . " " . $start_time;
+    $end_time = date("Y-m-d") . " " . $end_time;
+    $open_time = date("Y-m-d") . " " . "00:30";
+    $close_time = date("Y-m-d") . " " . "23:30";
+
+    if (((int) strtotime($start_time)) >= ((int) strtotime($end_time))) {
+      $errors[] = "Please enter a valid time range";
+    }
+    else if (((int) strtotime($start_time)) <= ((int) strtotime($open_time))) {
+      $errors[] = "Our working hours are from 12:30 AM to 11:30 PM";
+    }
+    else if (((int) strtotime($end_time)) >= ((int) strtotime($close_time))) {
+      $errors[] = "Our working hours are from 12:30 AM to 11:30 PM";
+    }
+
+    return $errors;
+  }
+
+  function insert_to_reservation($spot_ids, $start_time, $end_time) {
+    global $db;
+
+    $errors = validate_reservation($spot_ids, $start_time, $end_time);
+
+    if(!empty($errors)) {
+      return $errors;
+    }
+
+    $start_time = date("Y-m-d") . " " . $start_time;
+    $end_time = date("Y-m-d") . " " . $end_time;
+
+    foreach ($spot_ids as $spot_id) {
+      $sql = "INSERT INTO reservation ";
+      $sql .= "(user_id, spot_id, start_time, end_time) ";
+      $sql .= "VALUES (";
+      $sql .= "'" . db_escape($db, $_SESSION['user_id']) . "', ";
+      $sql .= "'" . db_escape($db, $spot_id) . "', ";
+      $sql .= "'" . db_escape($db, $start_time) . "', ";
+      $sql .= "'" . db_escape($db, $end_time) . "'";
+      $sql .= ")";
+
+      $result = mysqli_query($db, $sql);
+
+      update_spot($spot_id, 1);
+    }
+
+    // For INSERT statements, $result is true/false
+    if($result) {
+      return true;
+    } else {
+      // INSERT failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }
+  }
+
   // Coffees
 
   function find_all_coffees($options=[]) {
@@ -7,6 +196,18 @@
 
     $sql = "SELECT * FROM coffee ";
     $sql .= "ORDER BY coffee_id ASC";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    return $result;
+  }
+
+  function find_all_trending($options=[]) {
+    global $db;
+
+    $sql = "SELECT * FROM coffee ";
+    $sql .= "ORDER BY trend_val DESC ";
+    $sql .= "LIMIT 5";
 
     $result = mysqli_query($db, $sql);
     confirm_result_set($result);

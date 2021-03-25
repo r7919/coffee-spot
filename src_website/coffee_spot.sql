@@ -43,6 +43,90 @@ CREATE TABLE users (
 );
 
 INSERT INTO users VALUES (1, 'user', '$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
+INSERT INTO users VALUES (2, 'spiderman', '$2y$10$BaM/Nu5JZIBg3rqFtdJCtOaDW8NR0XfhuJ.DdIxfqYaOgJ2cRSoby');
+INSERT INTO users VALUES (3, 'user2', '$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
+INSERT INTO users VALUES (4, 'user1', '$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
+
+-- spot price
+
+DROP TABLE IF EXISTS spot_price;
+CREATE TABLE spot_price (
+    spot_type varchar(50) NOT NULL,
+    base_price int NOT NULL,
+    incr_price int NOT NULL,
+    PRIMARY KEY (spot_type)
+);
+
+INSERT INTO spot_price (spot_type, base_price, incr_price) VALUES ('single', 10, 5);
+INSERT INTO spot_price (spot_type, base_price, incr_price) VALUES ('double', 20, 10);
+INSERT INTO spot_price (spot_type, base_price, incr_price) VALUES ('quad', 40, 20);
+
+-- spot 
+
+DROP TABLE IF EXISTS spot;
+CREATE TABLE spot (
+    spot_id int NOT NULL AUTO_INCREMENT,
+    spot_type varchar(50) NOT NULL,
+    spot_status int NOT NULL,
+    PRIMARY KEY (spot_id),
+    FOREIGN KEY (spot_type) REFERENCES spot_price(spot_type)
+);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (1, 'single', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (2, 'single', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (3, 'single', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (4, 'single', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (5, 'single', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (6, 'single', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (7, 'single', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (8, 'double', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (9, 'double', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (10, 'double', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (11, 'double', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (12, 'double', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (13, 'double', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (14, 'double', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (15, 'double', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (16, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (17, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (18, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (19, 'quad', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (20, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (21, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (22, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (23, 'quad', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (24, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (25, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (26, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (27, 'quad', 0);
+
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (28, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (29, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (30, 'quad', 0);
+INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (31, 'quad', 0);
+
+-- reservation
+
+DROP TABLE IF EXISTS reservation;
+CREATE TABLE reservation (
+    user_id int NOT NULL,
+    spot_id int NOT NULL,
+    start_time datetime NOT NULL,
+    end_time datetime NOT NULL,
+    PRIMARY KEY (user_id, spot_id),
+	  FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (spot_id) REFERENCES spot(spot_id)
+);
+
+
+
 
 
 
