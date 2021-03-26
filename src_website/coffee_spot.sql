@@ -116,11 +116,13 @@ INSERT INTO spot (spot_id, spot_type, spot_status) VALUES (31, 'quad', 0);
 
 DROP TABLE IF EXISTS reservation;
 CREATE TABLE reservation (
+    id int NOT NULL AUTO_INCREMENT,
     user_id int NOT NULL,
     spot_id int NOT NULL,
     start_time datetime NOT NULL,
     end_time datetime NOT NULL,
-    PRIMARY KEY (user_id, spot_id),
+    r_status varchar(50) DEFAULT NULL,
+    PRIMARY KEY (id),
 	  FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (spot_id) REFERENCES spot(spot_id)
 );

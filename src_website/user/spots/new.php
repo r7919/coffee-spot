@@ -4,21 +4,12 @@ require_once('../shared/initialize.php');
 
 require_login();
 
-sync_spots();
-
-$spots_set_q = find_all_spots();
-$curr = 1;
-while($spot = mysqli_fetch_assoc($spots_set_q)) {
-    $spots_set[$curr] = $spot;
-    $curr++;
-}
-
 if(is_post_request()) {
 
     $spots_upd = [];
 
     for ($i = 1; $i <= 31; $i++) {
-        if (($spots_set[$i]['spot_status'] == 0) && ($_POST["{$i}"] == 1)) {
+        if ($_POST["{$i}"] == 1) {
             $spots_upd[] = $i;
         }
     }
@@ -35,6 +26,15 @@ if(is_post_request()) {
         $errors = $result;
     }
 } 
+
+sync_spots();
+
+$spots_set_q = find_all_spots();
+$curr = 1;
+while($spot = mysqli_fetch_assoc($spots_set_q)) {
+    $spots_set[$curr] = $spot;
+    $curr++;
+}
 
 function get_colour($id) {
     global $spots_set;

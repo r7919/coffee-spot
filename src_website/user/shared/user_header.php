@@ -21,8 +21,23 @@
         <li>User: <?php echo $_SESSION['username'] ?? ''; ?></li>
         <li><a href="<?php echo url_for('/index.php'); ?>">Menu</a></li>
         <li><a href="<?php echo url_for('/logout.php'); ?>">Logout</a></li>
-        <li>[<?php  echo date("l jS \of F Y h:i:s A") ?>]</li>
+        <li><span id="span"></span></li>
       </ul>
     </navigation>
+
+    <script>
+      var span = document.getElementById('span');
+
+      function time() {
+        var d = new Date();
+        var s = d.getSeconds();
+        var m = d.getMinutes();
+        var h = d.getHours();
+        span.textContent = 
+          ("0" + h).substr(-2) + ":" + ("0" + m).substr(-2) + ":" + ("0" + s).substr(-2);
+      }
+
+      setInterval(time, 1000);
+    </script>
 
     <?php echo display_session_message(); ?>

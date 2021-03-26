@@ -1,13 +1,13 @@
 <?php
 
-  // Spots
+  // Spot
 
   function find_all_reservations() {
     global $db;
 
     $sql = "SELECT * FROM reservation ";
     $sql .= "ORDER BY start_time ASC";
-
+    
     $result = mysqli_query($db, $sql);
     confirm_result_set($result);
 
@@ -19,7 +19,7 @@
 
     $sql = "SELECT * FROM spot ";
     $sql .= "WHERE spot_id='" . $id . "' ";
-
+    
     $result = mysqli_query($db, $sql);
     
     // For UPDATE statements, $result is true/false
@@ -42,24 +42,55 @@
 
     $sql = "SELECT * FROM reservation ";
     $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." ";
-    $sql .= "ORDER BY start_time DESC";
-
+    $sql .= "ORDER BY end_time DESC";
+    
     $result = mysqli_query($db, $sql);
     confirm_result_set($result);
 
     return $result;
   }
 
+  function find_all_active_reservations() {
+    global $db;
+
+    $sql = "SELECT * FROM reservation ";
+    $sql .= "WHERE r_status='active'";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  function mark_as_deallocated($id) {
+    global $db;
+
+    $sql = "UPDATE reservation SET ";
+    $sql .= "r_status='deallocated'";
+    $sql .= "WHERE id='" . $id . "' ";
+    $sql .= "LIMIT 1";
+
+    $result = mysqli_query($db, $sql);
+    
+    // For UPDATE statements, $result is true/false
+    if($result) {
+      return true;
+    } else {
+      // UPDATE failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }
+  }
+
   // dealloc
   function sync_spots() {
-    $reservations = find_all_reservations();
+    $reservations = find_all_active_reservations();
 
     while ($reservation = mysqli_fetch_assoc($reservations)) {
-      if (((int) strtotime($reservation['start_time'])) <= ((int) (time()))) {
-        update_spot($reservation['spot_id'], 1);
-      }
-      if (((int) strtotime($reservation['end_time'])) <= ((int) (time()))) {
+      if (((int) strtotime($reservation['end_time'])) < ((int) (time()))) {
         update_spot($reservation['spot_id'], 0);
+        mark_as_deallocated($reservation['id']);
       }
     }
 
@@ -71,8 +102,8 @@
     global $db;
 
     $sql = "UPDATE spot SET ";
-    $sql .= "spot_status='" . $status . "' ";
-    $sql .= "WHERE spot_id='" . $id . "' ";
+    $sql .= "spot_status=" . $status . " ";
+    $sql .= "WHERE spot_id=" . $id . " ";
     $sql .= "LIMIT 1";
 
     $result = mysqli_query($db, $sql);
@@ -131,6 +162,9 @@
     else if (count($spot_ids) == 0) {
       $errors[] = "Select atleast one spot.";
     }
+    else if (count($spot_ids) > 4) {
+      $errors[] = "Sorry you can book at max 4 at a time.";
+    }
 
     // validate time
     $start_time = date("Y-m-d") . " " . $start_time;
@@ -146,6 +180,9 @@
     }
     else if (((int) strtotime($end_time)) >= ((int) strtotime($close_time))) {
       $errors[] = "Our working hours are from 12:30 AM to 11:30 PM";
+    }
+    else if (((int) strtotime($start_time)) <= ((int) (time()))) {
+      $errors[] = "Start time cannot be less than current time.";
     }
 
     return $errors;
@@ -165,28 +202,29 @@
 
     foreach ($spot_ids as $spot_id) {
       $sql = "INSERT INTO reservation ";
-      $sql .= "(user_id, spot_id, start_time, end_time) ";
+      $sql .= "(user_id, spot_id, start_time, end_time, r_status) ";
       $sql .= "VALUES (";
-      $sql .= "'" . db_escape($db, $_SESSION['user_id']) . "', ";
-      $sql .= "'" . db_escape($db, $spot_id) . "', ";
-      $sql .= "'" . db_escape($db, $start_time) . "', ";
-      $sql .= "'" . db_escape($db, $end_time) . "'";
+      $sql .= "" . $_SESSION['user_id'] . ", ";
+      $sql .= "" . $spot_id . ", ";
+      $sql .= "'" . $start_time . "', ";
+      $sql .= "'" . $end_time . "', ";
+      $sql .= "'active'";
       $sql .= ")";
 
       $result = mysqli_query($db, $sql);
+      echo $sql;
+
+      if(!($result)) {
+        // UPDATE failed
+        echo mysqli_error($db);
+        db_disconnect($db);
+        exit;
+      }    
 
       update_spot($spot_id, 1);
     }
-
-    // For INSERT statements, $result is true/false
-    if($result) {
-      return true;
-    } else {
-      // INSERT failed
-      echo mysqli_error($db);
-      db_disconnect($db);
-      exit;
-    }
+    
+    return true;
   }
 
   // Coffees

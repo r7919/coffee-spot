@@ -24,7 +24,7 @@
   	<table class="list">
   	  <tr>
         <th>Spot ID</th>
-        <th>Status</th>
+        <th>Reservation Status</th>
         <th>Start Time</th>
         <th>End Time</th>
   	  </tr>
@@ -34,10 +34,10 @@
           <td><?php echo h($spot['spot_id']); ?></td>
           <td>
               <?php 
-                if (get_spot_status($spot['spot_id']) == 1)
+                if (((int) strtotime($spot['end_time'])) >= ((int) (time())))
                   echo "Active";
                 else
-                  echo "Deallocated";
+                  echo "Expired";
               ?>
           </td>
           <td><?php echo h($spot['start_time']); ?></td>
