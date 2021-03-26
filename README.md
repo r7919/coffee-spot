@@ -1,4 +1,5 @@
 ## Coffee Spot
+![Spots](demo/demo1.gif)
 
 - This project solves the problem of waiting time in a Coffee
 Shop.
