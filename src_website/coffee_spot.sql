@@ -7,7 +7,8 @@ CREATE TABLE coffee (
   coffee_price int NOT NULL,
   cook_time int NOT NULL,
   trend_val int NOT NULL,
-  PRIMARY KEY (coffee_id)
+  PRIMARY KEY (coffee_id),
+  KEY index_coffee_name (coffee_name)
 );
 
 INSERT INTO coffee (coffee_id, coffee_name, coffee_price, cook_time, trend_val) VALUES (1, 'Espresso', 225, 5, 1);
@@ -30,6 +31,22 @@ CREATE TABLE admins (
 );
 
 INSERT INTO admins VALUES (1,'ubc','admin','ubc@admin.com','ubc','$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
+
+-- employees
+
+DROP TABLE IF EXISTS employees;
+CREATE TABLE employees (
+  id int NOT NULL AUTO_INCREMENT,
+  first_name varchar(255) DEFAULT NULL,
+  last_name varchar(255) DEFAULT NULL,
+  email varchar(255) DEFAULT NULL,
+  username varchar(255) DEFAULT NULL,
+  hashed_password varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY index_username (username)
+);
+
+INSERT INTO employees VALUES (1,'elliot','employee','elliot@employee.com','elliot','$2y$10$HAxKzLL61e2HqGRg72./5uVRMcAKtgsn5DKGq4TR2kxErPhIwLssi');
 
 -- users
 
@@ -128,8 +145,21 @@ CREATE TABLE reservation (
 );
 
 
+-- orders
 
-
-
-
+DROP TABLE IF EXISTS orders;
+CREATE TABLE orders (
+    id int NOT NULL AUTO_INCREMENT,
+    user_id int NOT NULL,
+    coffee_id int NOT NULL,
+    coffee_name varchar(255) NOT NULL,
+    quantity int NOT NULL,
+    order_status varchar(50) NOT NULL,
+    ordered_at datetime NOT NULL,
+    expw_time int DEFAULT NULL,
+    PRIMARY KEY (id),
+	  FOREIGN KEY (coffee_id) REFERENCES coffee(coffee_id),
+    FOREIGN KEY (coffee_name) REFERENCES coffee(coffee_name),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 

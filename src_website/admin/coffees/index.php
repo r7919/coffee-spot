@@ -36,7 +36,7 @@
           <td><?php echo h($coffee['coffee_id']); ?></td>
           <td><?php echo h($coffee['coffee_name']); ?></td>
           <td><?php echo h($coffee['coffee_price']); ?></td>
-    	  <td><?php echo h($coffee['cook_time']); ?></td>
+          <td><?php echo h($coffee['cook_time']); ?></td>
           <td><?php echo h($coffee['trend_val']); ?></td>
           <td><a class="action" href="<?php echo url_for('/coffees/show.php?id=' . h(u($coffee['coffee_id']))); ?>">View</a></td>
           <td><a class="action" href="<?php echo url_for('/coffees/edit.php?id=' . h(u($coffee['coffee_id']))); ?>">Edit</a></td>

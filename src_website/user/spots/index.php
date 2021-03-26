@@ -15,7 +15,7 @@
 
 <div id="content">
   <div class="pages listing">
-    <h1>Booked Spots</h1>
+    <h1>Spots</h1>
 
     <div class="actions">
       <a class="action" href="<?php echo url_for('/spots/new.php'); ?>">Book a new spot</a>

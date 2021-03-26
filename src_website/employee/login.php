@@ -27,13 +27,13 @@ if(is_post_request()) {
     // Using one variable ensures that msg is the same
     $login_failure_msg = "Log in was unsuccessful.";
 
-    $user = find_user_by_username($username);
+    $employee = find_employee_by_username($username);
 
-    if($user) {
+    if($employee) {
 
-      if(password_verify($password, $user['hashed_password'])) {
+      if(password_verify($password, $employee['hashed_password'])) {
         // password matches
-        log_in_user($user);
+        log_in_employee($employee);
         redirect_to(url_for('/index.php'));
       } else {
         // username found, but password does not match
@@ -52,7 +52,7 @@ if(is_post_request()) {
 ?>
 
 <?php $page_title = 'Log in'; ?>
-<?php include(SHARED_PATH . '/user_header.php'); ?>
+<?php include(SHARED_PATH . '/employee_header.php'); ?>
 
 <div id="content">
   <h1>Log in</h1>
@@ -67,9 +67,6 @@ if(is_post_request()) {
     <input type="submit" name="submit" value="Submit"  />
   </form>
 
-  <br /><a href="<?php echo url_for('/register.php'); ?>">Create New Account  </a>
-  <br /><br /><a href="<?php echo url_for('/../employee/index.php'); ?>">Employee Portal</a>
-
 </div>
 
-<?php include(SHARED_PATH . '/user_footer.php'); ?>
+<?php include(SHARED_PATH . '/employee_footer.php'); ?>

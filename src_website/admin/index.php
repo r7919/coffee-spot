@@ -9,8 +9,9 @@
   <div id="main-menu">
     <h2>Main Menu</h2>
     <ul>
-      <li><a href="<?php echo url_for('/coffees/index.php'); ?>">Coffees</a></li>
-      <li><a href="<?php echo url_for('/admins/index.php'); ?>">Admins</a></li>
+      <li><a href="<?php echo url_for('/coffees/index.php'); ?>">Coffees</a></li> <br />
+      <li><a href="<?php echo url_for('/admins/index.php'); ?>">Admins</a></li> <br />
+      <li><a href="<?php echo url_for('/employees/index.php'); ?>">Employees</a></li>
     </ul>
   </div>
 </div>

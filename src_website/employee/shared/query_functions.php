@@ -2,6 +2,53 @@
 
   // orders
 
+  function update_order_status($id) {
+    global $db;
+
+    $sql = "UPDATE orders SET ";
+    $sql .= "order_status='Delivered' ";
+    $sql .= "WHERE id='" . $id . "' ";
+    $sql .= "LIMIT 1";
+
+    $result = mysqli_query($db, $sql);
+    
+    // For UPDATE statements, $result is true/false
+    if($result) {
+      return true;
+    } else {
+      // UPDATE failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }
+  }
+
+  function find_all_orders_preparing() {
+    global $db;
+
+    $sql = "SELECT * FROM orders ";
+    $sql .= "WHERE order_status='Preparing' ";
+    $sql .= "ORDER BY ordered_at ASC";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  function find_all_orders_delivered() {
+    global $db;
+
+    $sql = "SELECT * FROM orders ";
+    $sql .= "WHERE order_status='Delivered' ";
+    $sql .= "ORDER BY ordered_at DESC";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
   function validate_orders($coffee_array, $c_count, $order_qty) {
     $errors = [];
 
@@ -496,6 +543,19 @@
     $user = mysqli_fetch_assoc($result); // find first
     mysqli_free_result($result);
     return $user; // returns an assoc. array
+  }
+
+  function find_employee_by_username($username) {
+    global $db;
+
+    $sql = "SELECT * FROM employees ";
+    $sql .= "WHERE username='" . db_escape($db, $username) . "' ";
+    $sql .= "LIMIT 1";
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    $employee = mysqli_fetch_assoc($result); // find first
+    mysqli_free_result($result);
+    return $employee; // returns an assoc. array
   }
 
   function validate_user($user, $options=[]) {
