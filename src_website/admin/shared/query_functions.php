@@ -1,5 +1,84 @@
 <?php
 
+  // Spot Prices
+  function find_price_by_type($type) {
+    global $db;
+
+    $sql = "SELECT * FROM spot_price ";
+    $sql .= "WHERE spot_type='" . db_escape($db, $type) . "' ";
+
+    // echo $sql;
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    $price = mysqli_fetch_assoc($result);
+    mysqli_free_result($result);
+    return $price; // returns an assoc. array
+  }
+
+  function find_all_prices($options=[]) {
+    global $db;
+
+    $sql = "SELECT * FROM spot_price";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    return $result;
+  }
+
+
+  function validate_price($price) {
+    $errors = [];
+
+    //int
+    $base_price = (int) $price['base_price'];
+    if($base_price <= 0) {
+      $errors[] = "Base price must be greater than zero.";
+    }
+    if($base_price > 9999) {
+      $errors[] = "Base price must be less than 9999.";
+    }
+
+    $incr_price = (int) $price['incr_price'];
+    if($incr_price <= 0) {
+      $errors[] = "Increment price must be greater than zero.";
+    }
+    if($incr_price > 9999) {
+      $errors[] = "Increment price must be less than 9999.";
+    }
+    
+    return $errors;
+  }
+
+  function update_price($price) {
+    global $db;
+
+    $errors = validate_price($price);
+    if(!empty($errors)) {
+      return $errors;
+    }
+
+    $sql = "UPDATE spot_price SET ";
+    $sql .= "base_price='" . db_escape($db, $price['base_price']) . "', ";
+    $sql .= "incr_price='" . db_escape($db, $price['incr_price']) . "' ";
+    $sql .= "WHERE spot_type='" . db_escape($db, $price['spot_type']) . "' ";
+    $sql .= "LIMIT 1";
+
+    $result = mysqli_query($db, $sql);
+    
+    // For UPDATE statements, $result is true/false
+    if($result) {
+      return true;
+    } else {
+      // UPDATE failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }
+
+  }
+
+
+
   // Coffees
 
   function find_all_coffees($options=[]) {

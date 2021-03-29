@@ -2,6 +2,7 @@
   if(!isset($page_title)) { $page_title = 'User Area'; }
 ?>
 
+
 <!doctype html>
 
 <html lang="en">
@@ -13,17 +14,35 @@
 
   <body>
     <header>
-      <h1>Coffee Spot ~ User Area</h1>
-    </header>
+      <h1>Coffee Spot ~ 
+      <?php 
+        if (is_logged_in()) {
+          echo $_SESSION['username'] ?? ''; 
+          echo "'s";
+        }
+        else {
+          echo "User";
+        }
+      ?>
+      Area </h1>
 
-    <navigation>
-      <ul>
-        <li>User: <?php echo $_SESSION['username'] ?? ''; ?></li>
-        <li><a href="<?php echo url_for('/index.php'); ?>">Menu</a></li>
-        <li><a href="<?php echo url_for('/logout.php'); ?>">Logout</a></li>
-        <li><span id="span"></span></li>
-      </ul>
-    </navigation>
+    <div style="text-align: center;">
+        <ul id="horizontal-list">
+          <li><a href="<?php echo url_for('/index.php');?>" style="color: white;">Menu</a></li>
+          <?php
+            for ($i = 0; $i < 107; $i++)
+              echo "<li>&nbsp;</li>";
+          ?>
+          <li>Time: <span id="span"></span></li>
+          <?php
+            for ($i = 0; $i < 110; $i++)
+              echo "<li>&nbsp;</li>";
+          ?>
+          <li><a href="<?php echo url_for('/logout.php'); ?> " style="color: white;">Logout</a></li>
+        </ul>
+     </div>
+    
+     </header>
 
     <script>
       var span = document.getElementById('span');

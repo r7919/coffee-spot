@@ -54,7 +54,7 @@ if(is_post_request()) {
 <?php include(SHARED_PATH . '/admin_header.php'); ?>
 
 <div id="content">
-  <h1>Log in</h1>
+  <h1>Admin Log in</h1>
 
   <?php echo display_errors($errors); ?>
 

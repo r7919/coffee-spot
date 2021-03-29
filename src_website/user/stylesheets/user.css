@@ -4,15 +4,19 @@ html {
   }
   
   body {
-    height: 980px;
+    height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
+    /* background-image: url("/php_project/coffee-spot/images/background.png"); */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #FFB03B;
   }
   
   header {
     width: 100%;
-    height: 40px;
+    height: 80px;
     margin: 0 0 10px 0;
     padding: 0;
     background: #5B1B02;
@@ -55,10 +59,12 @@ html {
   footer {
     width: 100%;
     height: 40px;
-    margin: 0 0 10px 0;
-    padding: 10px 20px;
     background: #5B1B02;
     color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin: 0%;
   }
   
   /* Actions */
@@ -163,3 +169,14 @@ html {
     display: table;
     clear: both;
   } 
+
+  /* header */
+
+ul#horizontal-list {
+  min-width: 696px;
+  list-style: none;
+}
+
+ul#horizontal-list li {
+  display: inline;
+}

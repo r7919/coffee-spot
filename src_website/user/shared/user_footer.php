@@ -1,5 +1,7 @@
 <footer>
-  &copy; <?php echo date('Y'); ?> Coffee Spot
+ <p>
+   &copy; <?php echo date('Y'); ?> Coffee Spot
+ </p>
 </footer>
 
 </body>

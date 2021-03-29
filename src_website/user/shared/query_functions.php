@@ -1,5 +1,123 @@
 <?php
 
+ // coffees
+  function find_all_user_delivered_orders() {
+    global $db;
+
+    $sql = "SELECT * FROM orders ";
+    $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." AND order_status='Delivered' ";
+    $sql .= "ORDER BY ordered_at DESC";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  function find_all_user_preparing_orders() {
+    global $db;
+
+    $sql = "SELECT * FROM orders ";
+    $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." AND order_status='Preparing' ";
+    $sql .= "ORDER BY ordered_at DESC";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  // spot price
+  function find_all_prices($options=[]) {
+    global $db;
+
+    $sql = "SELECT * FROM spot_price";
+
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    return $result;
+  }
+
+
+
+  // coffee price
+  function get_coffee_price($id) {
+    global $db;
+
+    $sql = "SELECT * FROM coffee ";
+    $sql .= "WHERE coffee_id='" . db_escape($db, $id) . "' ";
+
+    // echo $sql;
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    $price = mysqli_fetch_assoc($result);
+    mysqli_free_result($result);
+
+    return $price['coffee_price']; // returns an assoc. array
+  }
+
+  // reservation prices
+
+  function find_price_by_type($type) {
+    global $db;
+
+    $sql = "SELECT * FROM spot_price ";
+    $sql .= "WHERE spot_type='" . db_escape($db, $type) . "' ";
+
+    // echo $sql;
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    $price = mysqli_fetch_assoc($result);
+    mysqli_free_result($result);
+
+    return $price; // returns an assoc. array
+  }
+
+  function find_type_by_spot_id($id) {
+    global $db;
+
+    $sql = "SELECT * FROM spot ";
+    $sql .= "WHERE spot_id='" . db_escape($db, $id) . "' ";
+
+    // echo $sql;
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    $spot_d = mysqli_fetch_assoc($result);
+    mysqli_free_result($result);
+
+    return $spot_d['spot_type']; 
+  }
+
+  function get_reservation_price($id) {
+    global $db;
+
+    $sql = "SELECT * FROM reservation ";
+    $sql .= "WHERE id='" . db_escape($db, $id) . "' ";
+
+    // echo $sql;
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+    $reservation = mysqli_fetch_assoc($result);
+    mysqli_free_result($result);
+
+    $start = (int) strtotime($reservation['start_time']);
+    $end = (int) strtotime($reservation['end_time']);
+
+    $diff = $end - $start + 1;
+
+    $diff /= 3600;
+    $diff--;
+    $diff = max($diff, 0);
+
+    $type = find_type_by_spot_id($reservation['spot_id']);
+    $price = find_price_by_type($type);
+
+    $res = (int) $price['base_price'];
+    $res += $diff * (int) $price['incr_price'];
+ 
+    return $res; // returns price for time intreval.
+  }
+
   // orders
 
   function validate_orders($coffee_array, $c_count, $order_qty) {
@@ -33,6 +151,8 @@
 
       if ($order_qty[$i] == 0)
         continue;
+      
+      increment_trend_val($order_qty[$i], $coffee_array[$i]['coffee_id']);
 
       $sql = "INSERT INTO orders ";
       $sql .= "(user_id, coffee_id, coffee_name, quantity, order_status, ordered_at, expw_time) ";
@@ -58,6 +178,27 @@
     }
 
     return true;
+  }
+
+  function increment_trend_val($ival, $id) {
+    global $db;
+
+    $sql = "UPDATE coffee SET ";
+    $sql .= "trend_val = trend_val + {$ival} ";
+    $sql .= "WHERE coffee_id='" . $id . "' ";
+    $sql .= "LIMIT 1";
+
+    $result = mysqli_query($db, $sql);
+    
+    // For UPDATE statements, $result is true/false
+    if($result) {
+      return true;
+    } else {
+      // UPDATE failed
+      echo mysqli_error($db);
+      db_disconnect($db);
+      exit;
+    }
   }
 
   function find_all_user_orders() {
@@ -117,6 +258,32 @@
 
     $sql = "SELECT * FROM reservation ";
     $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." ";
+    $sql .= "ORDER BY end_time DESC";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  function find_all_user_active_reservations() {
+    global $db;
+
+    $sql = "SELECT * FROM reservation ";
+    $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." AND r_status='active' ";
+    $sql .= "ORDER BY start_time DESC";
+    
+    $result = mysqli_query($db, $sql);
+    confirm_result_set($result);
+
+    return $result;
+  }
+
+  function find_all_user_expired_reservations() {
+    global $db;
+
+    $sql = "SELECT * FROM reservation ";
+    $sql .= "WHERE user_id=" . $_SESSION['user_id'] ." AND r_status='deallocated' ";
     $sql .= "ORDER BY end_time DESC";
     
     $result = mysqli_query($db, $sql);
